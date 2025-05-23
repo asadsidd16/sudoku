@@ -17,3 +17,9 @@ This project is a solution to the React Native coding challenge for Sudoku. It d
 ```bash
 npm install --legacy-peer-deps
 ```
+
+### 2. Run project
+
+```bash
+npx expo start
+```
