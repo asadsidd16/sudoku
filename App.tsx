@@ -8,6 +8,8 @@ import {
   Platform,
   TouchableOpacity,
   Keyboard,
+  Modal,
+  TouchableWithoutFeedback,
 } from "react-native";
 import { FontAwesome } from "@expo/vector-icons";
 import isEqual from "lodash/isEqual";
@@ -28,6 +30,8 @@ export default function App() {
   const [board, setBoard] = useState<string[][]>([]);
   const [locked, setLocked] = useState<boolean[][]>([]);
   const [error, setError] = useState<string>("");
+  const [isSuccessModalVisible, setIsSuccessModalVisible] =
+    useState<boolean>(false);
 
   useEffect(() => {
     setBoard(starterBoard);
@@ -64,9 +68,7 @@ export default function App() {
       let seen = new Set();
       for (let i = 0; i < 9; i++) {
         if (seen.has(board[col][i])) {
-          setError(
-            "Cßol has duplicate values. Must be numeric 1-9 per column."
-          );
+          setError("Col has duplicate values. Must be numeric 1-9 per column.");
           return;
         }
         seen.add(board[col][i]);
@@ -87,6 +89,8 @@ export default function App() {
         }
       }
     }
+    setError("");
+    setIsSuccessModalVisible(true);
   };
 
   const resetBoard = () => {
@@ -96,64 +100,101 @@ export default function App() {
   };
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" ? "padding" : undefined}
-      style={{ flex: 1 }}
-    >
-      <View style={{ flex: 1 }}>
-        <View style={styles.container}>
-          <Text style={styles.header}>Sudoku</Text>
-          {board.map((row, rowIndex) => (
-            <View key={rowIndex} style={styles.row}>
-              {row.map((cell, colIndex) => (
-                <TextInput
-                  key={`${rowIndex}-${colIndex}`}
-                  style={[
-                    styles.cell,
-                    rowIndex % 3 === 0 && rowIndex !== 0
-                      ? styles.thickTopBorder
-                      : {},
-                    colIndex % 3 === 0 && colIndex !== 0
-                      ? styles.thickLeftBorder
-                      : {},
-                  ]}
-                  maxLength={1}
-                  onChangeText={(text) =>
-                    handleChange(text, rowIndex, colIndex)
-                  }
-                  value={cell}
-                  keyboardType="numeric"
-                  editable={!locked[rowIndex][colIndex]}
-                />
-              ))}
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        style={{ flex: 1 }}
+      >
+        <View style={{ flex: 1 }}>
+          <View style={styles.container}>
+            <Text style={styles.header}>Sudoku</Text>
+            {board.map((row, rowIndex) => (
+              <View key={rowIndex} style={styles.row}>
+                {row.map((cell, colIndex) => (
+                  <TextInput
+                    key={`${rowIndex}-${colIndex}`}
+                    style={[
+                      styles.cell,
+                      rowIndex % 3 === 0 && rowIndex !== 0
+                        ? styles.thickTopBorder
+                        : {},
+                      colIndex % 3 === 0 && colIndex !== 0
+                        ? styles.thickLeftBorder
+                        : {},
+                    ]}
+                    maxLength={1}
+                    onChangeText={(text) =>
+                      handleChange(text, rowIndex, colIndex)
+                    }
+                    value={cell}
+                    keyboardType="numeric"
+                    editable={!locked[rowIndex][colIndex]}
+                  />
+                ))}
+              </View>
+            ))}
+            <View>
+              <Text style={styles.errorText}>{error}</Text>
             </View>
-          ))}
-          <View>
-            <Text style={styles.errorText}>{error}</Text>
-          </View>
-          <View style={styles.buttonContainer}>
-            <TouchableOpacity style={styles.submitButton} onPress={checkBoard}>
-              <Text style={styles.buttonText}>Finished</Text>
-              <FontAwesome
-                name="check"
-                size={16}
-                color="#fff"
-                style={{ marginLeft: 8 }}
-              />
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.submitButton} onPress={resetBoard}>
-              <Text style={styles.buttonText}>Reset</Text>
-              <FontAwesome
-                name="refresh"
-                size={16}
-                color="#fff"
-                style={{ marginLeft: 8 }}
-              />
-            </TouchableOpacity>
+            <View style={styles.buttonContainer}>
+              <TouchableOpacity
+                style={styles.submitButton}
+                onPress={checkBoard}
+              >
+                <Text style={styles.buttonText}>Finished</Text>
+                <FontAwesome
+                  name="check"
+                  size={16}
+                  color="#fff"
+                  style={{ marginLeft: 8 }}
+                />
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.submitButton}
+                onPress={resetBoard}
+              >
+                <Text style={styles.buttonText}>Reset</Text>
+                <FontAwesome
+                  name="refresh"
+                  size={16}
+                  color="#fff"
+                  style={{ marginLeft: 8 }}
+                />
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
-      </View>
-    </KeyboardAvoidingView>
+        <Modal
+          animationType="fade"
+          transparent={true}
+          visible={isSuccessModalVisible}
+          onRequestClose={() => setIsSuccessModalVisible(false)}
+        >
+          <View style={styles.modalOverlay}>
+            <View style={styles.modalContainer}>
+              <Text
+                style={{ fontSize: 22, fontWeight: "bold", marginBottom: 10 }}
+              >
+                Congratulations Champ!
+              </Text>
+              <Text>You can actually solve a sudoku puzzle :)</Text>
+              <TouchableOpacity
+                style={[styles.submitButton, { marginTop: 30 }]}
+                onPress={() => setIsSuccessModalVisible(false)}
+              >
+                <Text style={styles.buttonText}>Close</Text>
+                <FontAwesome
+                  name="close"
+                  size={16}
+                  color="#fff"
+                  style={{ marginLeft: 8 }}
+                />
+              </TouchableOpacity>
+            </View>
+          </View>
+        </Modal>
+      </KeyboardAvoidingView>
+    </TouchableWithoutFeedback>
   );
 }
 
@@ -217,5 +258,21 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     gap: 10,
     marginTop: 10,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  modalContainer: {
+    backgroundColor: "#fff",
+    padding: 20,
+    borderRadius: 10,
+    alignItems: "center",
+    shadowColor: "#000",
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 5,
   },
 });
