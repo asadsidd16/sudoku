@@ -1,8 +1,8 @@
-# Terros React Native Coding Challenge
+# Sudoku React Native Coding Challenge
 
 ## Overview
 
-This project is a solution to the React Native coding challenge provided by Terros. It demonstrates my ability to build a mobile application from scratch using TypeScript, React Native, and testing best practices.
+This project is a solution to the React Native coding challenge for Sudoku. It demonstrates my ability to build a mobile application from scratch using TypeScript, React Native, and testing best practices.
 
 ## Tech Stack
 
