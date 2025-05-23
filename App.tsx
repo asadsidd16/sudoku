@@ -50,6 +50,7 @@ export default function App() {
   };
 
   const checkBoard = () => {
+    //used lodash for a deep comparison of the board and starter board
     if (isEqual(board, starterBoard)) {
       setError("You should actually start :)");
       return;

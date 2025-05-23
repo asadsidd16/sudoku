@@ -2,7 +2,7 @@
 
 ## Overview
 
-This project is a solution to the React Native coding challenge for Sudoku. It demonstrates my ability to build a mobile application from scratch using TypeScript, React Native, and testing best practices.
+This project is a Sudoku puzzle built in React Native, Expo and TypeScript. It demonstrates my ability to build a mobile application from scratch using best practices.
 
 ## Tech Stack
 
@@ -22,4 +22,10 @@ npm install --legacy-peer-deps
 
 ```bash
 npx expo start
+```
+
+### 2. Test UI rendering
+
+```bash
+npm test
 ```
